@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ButtonVariants = "primary" | "outline" | "secondary" | "success" | "danger";
 
-interface ButtoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: ButtonVariants;
   fullWidth?: boolean;
@@ -17,7 +17,7 @@ const Button = ({
   className,
   disabled,
   ...rest // No rest tudo que mandar de outras coisas como onClick vai ser passado apara dentro do rest.
-}: ButtoProps) => {
+}: ButtonProps) => {
   const variantClasses = {
     primary:
       "bg-primary-500 text-[#051626] font-semibold hover:bg-primary-600 active:translate-y-0",
