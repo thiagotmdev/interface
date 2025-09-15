@@ -1,4 +1,4 @@
-import { AArrowUp, ArrowUp, Wallet } from "lucide-react";
+import { ArrowUp, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import Card from "../components/Card";
 import MonthYearSelect from "../components/MonthYearSelect";
