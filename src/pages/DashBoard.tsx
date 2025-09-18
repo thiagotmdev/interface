@@ -1,5 +1,13 @@
-import { ArrowUp, Wallet } from "lucide-react";
+import { ArrowUp, TrendingUp, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  type PieLabelRenderProps,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import Card from "../components/Card";
 import MonthYearSelect from "../components/MonthYearSelect";
 import { getTransactionsSummary } from "../services/transactionService";
@@ -10,7 +18,7 @@ const initialSummary: TransactionSummary = {
   balance: 0,
   totalExpenses: 0,
   totalIncomes: 0,
-  expenseByCategory: [],
+  expensesByCategory: [],
 };
 
 const DashBoard = () => {
@@ -28,6 +36,25 @@ const DashBoard = () => {
 
     loadTransactionsSummary();
   }, [month, year]);
+
+  const chartData = summary.expensesByCategory.map((item) => ({
+    categoryId: item.categoryId,
+    categoryName: item.categoryName,
+    categoryColor: item.categoryColor,
+    amount: item.amount,
+    percentage: item.percentage,
+  }));
+
+  const renderPieChartLabel = ({ categoryName, percent }: PieLabelRenderProps): string => {
+    if (typeof percent === "number") {
+      return `${categoryName}: ${(percent * 100).toFixed(1)}%`;
+    }
+    return `${categoryName}: 0%`;
+  };
+
+  const formatToolTipValue = (value: number | string): string => {
+    return formatCurrency(typeof value === "number" ? value : 0);
+  };
 
   return (
     <div className="container-app py-6">
@@ -73,6 +100,42 @@ const DashBoard = () => {
               {formatCurrency(summary.balance)}
             </p>
           </div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6 mt-7">
+        <Card
+          icon={<TrendingUp size={20} className="text=primary-500" />}
+          title="Despesas por categoria"
+          className="min-h-80"
+          hover
+        >
+          {summary.expensesByCategory.length > 0 ? (
+            <div className="h-72 mt-4">
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="amount"
+                    nameKey="categoryName"
+                    label={renderPieChartLabel}
+                  >
+                    {chartData.map((entry) => (
+                      <Cell key={entry.categoryId} fill={entry.categoryColor} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={formatToolTipValue} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              Nenhuma despesa registrada nesse período
+            </div>
+          )}
         </Card>
       </div>
     </div>
