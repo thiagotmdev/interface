@@ -1,11 +1,12 @@
 import { AlertCircle, ArrowDown, ArrowUp, Plus, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { toast } from "react-toastify";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import Input from "../components/Input";
 import MonthYearSelect from "../components/MonthYearSelect";
-import { getTransactions } from "../services/transactionService";
+import { deleteTransactions, getTransactions } from "../services/transactionService";
 import { type Transaction, TransactionType } from "../types/transactions";
 import { formatCurrency, formatDate } from "../utils/formatters";
 
@@ -24,7 +25,6 @@ const Transactions = () => {
       setError("");
       const data = await getTransactions({ month, year });
       setTransactions(data);
-      console.log(data);
       // biome-ignore lint/correctness/noUnusedVariables: variable 'data' is used to set state
     } catch (err) {
       setError("Não foi possível carregar as transações, tente novamente");
@@ -33,7 +33,25 @@ const Transactions = () => {
     }
   };
 
-  const handleDelete = (id: string): void => {};
+  const handleDelete = async (id: string): Promise<void> => {
+    try {
+      setDeletingId(id);
+      await deleteTransactions(id);
+      toast.success("Transação deletada com sucesso!");
+      setTransactions((prev) => prev.filter((t) => t.id !== id));
+    } catch (error) {
+      console.error(error);
+      toast.error("Falha ao deletar Transação");
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  const confirmDelete = (id: string): void => {
+    if (window.confirm("Tem certeza que deseja deletar essa transação ?")) {
+      handleDelete(id);
+    }
+  };
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: dependencies are intentionally limited to month and year
   useEffect(() => {
@@ -96,7 +114,7 @@ const Transactions = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="divide-y divide-gray-700 min-h-full">
+            <table className="divide-y divide-gray-700 min-h-full w-full">
               <thead>
                 <tr>
                   <th
@@ -149,11 +167,11 @@ const Transactions = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-sm whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       {formatDate(transaction.date)}
                     </td>
 
-                    <td className="px-6 py-4 text-sm whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       <div className="flex items-center">
                         <div
                           className="w-2 h-2 rounded-full mr-2"
@@ -163,7 +181,7 @@ const Transactions = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4 text-sm whitespace-nowrap">
+                    <td className="px-3 py-4 text-sm whitespace-nowrap">
                       <span
                         className={`${transaction.type === TransactionType.INCOME ? "text-primary-500" : "text-red-500"}`}
                       >
@@ -171,11 +189,11 @@ const Transactions = () => {
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 whitespace-nowrap cursor-pointer">
+                    <td className="px-3 py-4 whitespace-nowrap">
                       <button
                         type="button"
-                        onClick={() => handleDelete(transaction.id)}
-                        className="text-red-500 hover:text-red-400 rounded-full"
+                        onClick={() => confirmDelete(transaction.id)}
+                        className="text-red-500 hover:text-red-400 rounded-full cursor-pointer"
                         disabled={deletingId === transaction.id}
                       >
                         {deletingId === transaction.id ? (
