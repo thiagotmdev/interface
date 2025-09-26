@@ -1,5 +1,5 @@
 import { AlertCircle, ArrowDown, ArrowUp, Plus, Search, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
 import Button from "../components/Button";
@@ -17,7 +17,9 @@ const Transactions = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [deletingId, setDeletingId] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
 
   const fetchTransactions = async (): Promise<void> => {
     try {
@@ -25,6 +27,7 @@ const Transactions = () => {
       setError("");
       const data = await getTransactions({ month, year });
       setTransactions(data);
+      setFilteredTransactions(data);
       // biome-ignore lint/correctness/noUnusedVariables: variable 'data' is used to set state
     } catch (err) {
       setError("Não foi possível carregar as transações, tente novamente");
@@ -58,6 +61,15 @@ const Transactions = () => {
     fetchTransactions();
   }, [month, year]);
 
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setSearchText(event.target.value);
+    setFilteredTransactions(
+      transactions.filter((transaction) =>
+        transaction.description.toUpperCase().includes(event.target.value.toUpperCase()),
+      ),
+    );
+  };
+
   return (
     <div className="container-app py-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -83,7 +95,13 @@ const Transactions = () => {
       </Card>
 
       <Card className="mb-6">
-        <Input placeholder="Buscar Transações..." icon={<Search className="w-4 h4" />} fullWidth />
+        <Input
+          placeholder="Buscar Transações..."
+          icon={<Search className="w-4 h4" />}
+          fullWidth
+          onChange={handleSearchChange}
+          value={searchText}
+        />
       </Card>
 
       <Card className="overflow-hidden">
@@ -150,7 +168,7 @@ const Transactions = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {transactions.map((transaction) => (
+                {filteredTransactions.map((transaction) => (
                   <tr key={transaction.id} className="hover:bg-gray-800">
                     <td className="px-6 py-4 text-sm text-gray-400 whitespace-nowrap">
                       <div className="flex items-center">
