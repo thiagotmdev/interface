@@ -53,13 +53,13 @@ const TransactionsForm = () => {
   const handleSubmit = () => {};
 
   return (
-    <div>
-      <div>
-        <h1>TransactionsForm</h1>
+    <div className="container-app py-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Nova Transação</h1>
         <Card>
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor={formId}>Tipo de Despesas</label>
+            <div className="mb-4 flex gap-2 flex-col">
+              <label htmlFor={formId}>Tipo de Transação</label>
               <TransactionTypeSelector
                 id={formId}
                 value={formData.type}
@@ -85,7 +85,7 @@ const TransactionsForm = () => {
               value={formData.amount}
               onChange={handleChange}
               placeholder="R$ 0,00"
-              icon={<DollarSign className="w-4 h-4" />}
+              icon={<DollarSign className="w-4 h-4 relative mt-2" />}
               required
             />
 
@@ -96,7 +96,7 @@ const TransactionsForm = () => {
               value={formData.date}
               onChange={handleChange}
               placeholder="R$ 0,00"
-              icon={<Calendar className="w-4 h-4" />}
+              icon={<Calendar className="w-4 h-4 relative mt-2" />}
               required
             />
 
@@ -105,7 +105,7 @@ const TransactionsForm = () => {
               name="categoryId"
               value={formData.categoryId}
               onChange={handleChange}
-              icon={<Tag className="w-4 h-4" />}
+              icon={<Tag className="w-4 h-4 ml-1" />}
               required
               options={[
                 { value: "", label: "Selecione uma categoria" },
