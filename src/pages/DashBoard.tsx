@@ -114,7 +114,7 @@ const DashBoard = () => {
         <Card icon={<Wallet size={20} className="text-red-600" />} title="Despesas" hover>
           <div>
             <p className="text-2xl font-semibold mt-2 text-red-600">
-              {formatCurrency(summary.balance)}
+              {formatCurrency(summary.totalExpenses)}
             </p>
           </div>
         </Card>

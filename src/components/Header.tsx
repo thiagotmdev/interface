@@ -1,4 +1,4 @@
-import { Activity, LogIn, LogOut } from "lucide-react";
+import { Activity, LogIn, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext";
@@ -22,7 +22,12 @@ const Header = () => {
   ];
 
   const handleSignOut = () => {
+    setIsOpen(false);
     signOut();
+  };
+
+  const changeMenu = (): void => {
+    setIsOpen(!isOpen);
   };
 
   const renderAvatar = () => {
@@ -91,8 +96,67 @@ const Header = () => {
               </Link>
             )}
           </div>
+
+          <div className="md:hidden flexx items-center">
+            <button
+              type="button"
+              className="text-gray-400 p-2 rounded-lg hover:bg-gray-800 transition-colors"
+              onClick={changeMenu}
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {isOpen && (
+        <div>
+          <div>
+            {isAuthenticated ? (
+              <>
+                <nav className="space-y-1">
+                  {navLink.map((link) => (
+                    <Link
+                      to={link.path}
+                      key={link.path}
+                      className={`block p-5 py-2 rounded-lg ${
+                        pathname === link.path
+                          ? "bg-gray-800 text-primary-500 font-medium"
+                          : "text-gray-400 hover:bg-gray-800 hover:text-primary-500"
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="flex items-center justify-between p-4 border-t border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    {renderAvatar()}
+                    <span>{authState.user?.displayName}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="cursor-pointer text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-200 transition-colors"
+                  >
+                    <LogOut size={20} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-primary-500 text-gray-800 font-semibold px-5 py-2.5 rounded-2xl flex items-center justify-center hover:bg-primary-600"
+                onClick={() => setIsOpen(false)}
+              >
+                Entrar
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };
